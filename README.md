@@ -15,6 +15,7 @@
 | 10.0 Rebase                                       | 10.0 Rebase<br>10.1 Difference between git merge and git rebase                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | 11.0 Git clone                                    | 11.0 Git clone<br>11.1 Cloning from git repository                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | 12.0 Forking                                      | 12.0 Forking<br>12.1 What is forking used for?<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 13.0 Layout of Github \| Git Branches             | 13.0 Layout of Github Remote Repository/Dashboard<br>13.1 Git Branches                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 # 1.0 Installation
 
@@ -1118,17 +1119,17 @@ c9f2530 third commit
 # 5.0 Topic: Git Ignore (simpli learn)
 
 Sometimes its important to ignore files while creating a version of your project, these could be packages and other irrelevant files that are not needed for production, and can be installed by other users on their local systems later. One other reason could be to avoid heavy files from being transfered.
-166. Files are stored inside a file called ***.gitignore***
-167. This would avoid *tracking* any files or folders.
-168. You can mention the ***File name + File pattern*** in the gitignore file.
-169. You can also ***override*** the *filename + file pattern* using the **-f flag**.
+1. Files are stored inside a file called ***.gitignore***
+2. This would avoid *tracking* any files or folders.
+3. You can mention the ***File name + File pattern*** in the gitignore file.
+4. You can also ***override*** the *filename + file pattern* using the **-f flag**.
 
 ```
-170. Add the .gitignore file using vi command or touch command, and add *.txt line inside the .gitignore file, this prevents files from being tracked.
-171. The .gitignore file will be untracked.
-172. Create another file.
-173. Add it to the staging Area then commit it.
-174. Check if the commit works.
+1. Add the .gitignore file using vi command or touch command, and add *.txt line inside the .gitignore file, this prevents files from being tracked.
+2. The .gitignore file will be untracked.
+3. Create another file.
+4. Add it to the staging Area then commit it.
+5. Check if the commit works.
 
 vi .gitignore
 
@@ -1189,7 +1190,7 @@ $ git commit -m 'add e.txt with -f flag'
 
 Sometimes there are folders or modules that you don't want to push or add to your repository, therefore the best way to do that is to keep them in a file called .**gitignore**. All you need to do is make a list of all the names of files, folders or extensions, each in a new line.
 
-1. To ignore all files of a certain extension type:  `*.extension`
+1. To ignore all files in the entire repository, of a certain extension type:  `*.extension`
 2. To ignore all files with the same or specific name found anywhere in the project, just type the filename without giving the path: `filename.txt`
 3. To ignore a specific file in a specific location, use the full path seen from the *root* of your project folder. Example `/path/new.txt`
 4. To ignore all files in a certain folder: `/path/to/*`
@@ -1809,6 +1810,12 @@ git push origin main/master
 NOTE: You can push it once the SSH keys are set. In the previous sections, we learned various different methods of using the SSH Key gen command to generate and save SSH keys.
 ```
 
+### 7.14 How to create a new Remote Connection/name?
+
+1. git remote -v : provides the current remote connections to your **local directory.**
+2. git remote add 'nameOfConnection' 'linkOfGitHubRepo': This will allow you to create a **new name of connection** and also the link is required to connect your **local directory/repo** with the **github repo.**
+3. **origin** is a **default** connection name.
+4. Note: You should call it MAIN, as its a name used most commonly. The first time you create a new name for connection, **automatically becomes** part of the **default connection name.**
 ## 8.0 Git Pull
 
 1. Login to your github.
@@ -3011,7 +3018,7 @@ e. **Create a Pull Request (Optional)** → If you want to contribute changes to
 3. Keeping a personal copy of a project for customization.
 
 
-### Layout of Github Remote Repository/Dashboard
+## 13.0 Layout of Github Remote Repository/Dashboard
 
 If you click on **branches** on your working remote repository, it will indicate 3 sections names *Default, Your Branches and Active Branches Section*. Below is an explanation of what each entails:
 
@@ -3027,6 +3034,16 @@ Table 1.1
 | Your Branches   | All branches that belong to you (created or pushed by you) in the remote repository.                         | - Created using `git branch` locally or directly on GitHub.  <br>- Visible under your profile's contributions. | - May include feature branches, bug fixes, or experimental branches.  <br>- Not necessarily merged yet.    |
 | Active Branches | All branches in the repository that have recent commits or are actively being worked on.                     | - Includes branches updated recently (e.g., last push or pull).  <br>- Shown on the GitHub branches page.      | - Not tied to any specific contributor.  <br>- Can include stale branches if they've been pushed recently. |
 
+### 13.1 Git Branches
+
+Git branch commands
+
+1. **git branch** provides the list of branches and indicates which branch you are at.
+2. **git branch -M main** _to **rename** an existing branch you are on._
+3. **git checkout 'branch name'** _to navigate/switch to another branch._
+4. **git checkout -b 'new branch name'**: _to **replace** the name of an existing branch with a **new branch name**, and also **switch simaltaneously.** Its a quick way to replace + switch_ **Note:** this allows to copy all your last commits to the newly created branch.
+5. **git branch -d 'branch name'**: This deletes the branch. _You have to switch to another branch in order to delete the branch you are currently on. In other words you cannot delete the branch you are currently on._
+6. **Note:** You cannot create a new branch until you have made your first commit.
 ### Additional Commands
 
 1. **ls** command allows you to list all the files in your current directory.
@@ -3065,3 +3082,32 @@ Lesson Section
 4. **Your Branches**: Helps you track contributions made under your account. Ideal for managing individual tasks or features.
 5. **Active Branches**: Useful for collaboration, as it shows ongoing work. This list may change frequently.
 6. **Clean working directory**: This indicates that all changes were added and committed already, therefore the repository status is labelled as **clean.**
+7. Use **touch .gitignore** cmd to create the file.
+8. **Ignoring a file:** If you want to ignore a specific file, you will have to provide the **full path** of the file location from the **root folder**, along with its extension. Example /test/text.txt OR test/text.txt _can write both ways._
+9. To ignore a specific file (e.g., index.html in the root directory):  
+    **index.html**
+4. Example for files in a specific directory:  
+    If the file is in a subdirectory, include the path relative to the repository root:  
+    **subdirectory/example.html**
+5. To ignore all HTML files in a specific directory, use:  
+    **subdirectory/*.html**
+6. To ignore all HTML files throughout the repository, add:  
+    ***.html**
+7. **Remove the File from the Staging Area**. _If the file is already tracked by Git (i.e., has been committed before), you'll need to untrack it before it can be ignored. Use the following command:_  
+    **git rm --cached 'file-path'**  
+    For example, if you're ignoring index.html:  
+    **git rm --cached index.html**  
+    **Note:** This command will remove the file from the Git index but keep it in your working directory.
+8. **Commit the Changes**. _Commit the updated **.gitignore** and any changes from the **untracked file**:_   **git add .gitignore  
+    git commit -m "Add index.html to .gitignore"**
+9. **What git push -u Does?**
+	a. When you use **git push -u origin 'branch-name'** , you are telling Git to:
+    1. Push the specified **local** branch to the **remote** repository (origin).
+    2. Set the **upstream branch** for the **local** branch, which means that your local branch will be **linked** to the remote branch on the _specified remote repository (origin)_.
+	b. Simplifies Future Pushes and Pulls:
+    1. Once the upstream branch is set, you can simply use git push or git pull without specifying the remote and branch name. Git will remember the remote branch and automatically use it for future pushes and pulls.
+    2. **git push** and **git pull**
+    3. To track the **status** use **git status**
+    4. It helps keep track of changes and ensures that everyone is working on the correct branches, reducing the chance of errors in collaborative environments.
+    5. To check which **upstream** is the **local branch** tracking:  
+        **git branch -vv**
