@@ -1,4 +1,3 @@
-
 ### Topics
 
 | Topics                                            | Headings                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
@@ -1195,6 +1194,9 @@ Sometimes there are folders or modules that you don't want to push or add to you
 3. To ignore a specific file in a specific location, use the full path seen from the *root* of your project folder. Example `/path/new.txt`
 4. To ignore all files in a certain folder: `/path/to/*`
 5. To ignore a particular folder entirely along with subdirectories: `foldername/`
+6. To ignore all Files + Folders, simply use an *asterisk*
+7. Run `git status --ignored` command to check if git is tracking any unwanted files.
+8. If git is tracking ***unwanted files/folders,*** then use the following command: `git rm -r --cached Data_cleaning_and_visualization/share/`
 # 6.0 Topic: Renaming Files
 
 1. `git mv <filename> <newFileName>`
@@ -3111,3 +3113,108 @@ Lesson Section
     4. It helps keep track of changes and ensures that everyone is working on the correct branches, reducing the chance of errors in collaborative environments.
     5. To check which **upstream** is the **local branch** tracking:  
         **git branch -vv**
+
+## 14.0 Scenerios
+
+### 14.1 How to use a local repository for both Github and gitLab?
+
+1. Assuming that you have already pushed a project on ***gitlab***, and you want to push the same project on **github**.
+2. **Add github to your remote connection:** *git remote add github `url of github repo`* You will need to create a new remote connection by the name of github or any other name.
+3. **Add changes to the staging area:** *git add .*
+4. **Commit your changes:** *git commit -m 'new commit'*
+5. **Push your code:** *git push github main*
+6. **To replace your current remote connection:** *git remote set-url origin `https://github.com/yourusername/kubernetes.git`* But not recommended, otherwise you will lose your remote connection to gitlab.
+7. **Note:** Always check which branch you're at in your local system, and the default branch of your github account. Generally the default branch initialized locally is master and github is main.
+8. Check the ***remote connection:*** *git remote -v*
+
+```
+git remote -v
+
+OUTPUT:
+
+github  https://github.com/s#$%#$%#$%arih/Ku#$%#$%#$%.git (fetch) --> New Connection
+github  https://github.com/s#$%#$%#$%arih/Ku#$%#$%#$%.git (push)  --> New Connection
+origin  https://gitlab.com/s#$%#$%#$%rih/ku#$%#$%#$%-projects.git (fetch)
+origin  https://gitlab.com/s#$%#$%#$%rih/ku#$%#$%#$%-projects.git (pu
+```
+
+### 14.2 How do you initialize git one level up after already having pushed the current folder to github & gitlab?
+
+1. Sometimes we end up initializing git inside the project folder itself, that means you can only work with that project folder/repository specifically. What if you wanted to have a ***parent folder*** one level up so you can push new projects inside independent subfolders of the parent folder? You can do that by the method enlisted below.
+
+```
+EXAMPLE of your situation:
+
+Kubernetes/         ← This will be your GitHub repo (with its own README.md)
+├── README.md       ← Main intro + links to sub-projects
+├── project_One/    ← Already initialized with its own README.md
+│   └── ...
+├── project_Two/    ← Later add more projects here
+
+NOTE:
+1. You initially pushed project_One and had initialized that folder, and how after having pushed your content and keeping in mind that the working tree is clean, you can now initialize the parent directory and start using that to push your content from the parent folder.
+```
+
+2. Steps to Set It Up:
+	a. **Go to your parent folder**:
+```
+cd path/to/Kubernetes
+
+```
+b. **Initialize it as a new Git repo** (if not already):
+
+```
+git init
+
+```
+
+c. **Create a new `README.md`** inside the parent `Kubernetes` folder:
+
+```
+echo "# Kubernetes Projects" > README.md
+
+```
+d. **Add contents like this** in the `README.md`
+e. Connect to your GitHub repo (only if not already done):
+
+```
+git remote add origin https://github.com/yourusername/Kubernetes.git
+```
+
+f. Add and push everything:
+
+```
+git add .
+git commit -m "Initial commit with parent README"
+git push -u origin main
+
+```
+
+2. **Conclusion:**
+	a. Now the parent `Kubernetes/` folder is the Git repo.
+    b. `project_One/` remains a subfolder with its own `README.md`, no need for a separate Git repo inside it anymore.
+    c. Avoid nested `.git` folders — you can delete the `.git/` inside `project_One` if you don't need it to be an independent repo.
+3. **Will there be any conflict?** *If you now push from the **parent `Kubernetes/` folder** instead of `project_One/`, this will **replace the structure** in GitHub/GitLab with the full folder layout (parent + subfolders). It won't cause a conflict as long as:*
+	a. You're using the **same branch** (`main` or `master`)
+	b. You **add/commit/push from the parent folder** now
+	c. You’re okay with changing the folder structure in GitHub to show `project_One/` as a subfolder (which you want)
+4. Conflict may occur _only_ if:
+	a. You had uncommitted changes inside `project_One` that are different
+	b. You try to push from both `project_One` and `Kubernetes` separately, and both are initialized Git repos
+5. To Avoid Conflicts Going Forward:
+	a. Delete the `.git/` folder inside `project_One/` (so only the parent `Kubernetes/` is a Git repo):
+```
+rm -rf project_One/.git
+--------------------------
+Always push from the parent folder:
+
+git add .
+git commit -m "Updated Project One"
+git push
+------------------------
+This keeps everything clean and conflict-free
+```
+### Additional research required
+
+1. git switch
+2. how to setup upstream on git
