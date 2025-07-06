@@ -3218,3 +3218,8 @@ This keeps everything clean and conflict-free
 
 1. git switch
 2. how to setup upstream on git
+
+
+## License
+
+This project is licensed under the [MIT License](./LICENSE).
