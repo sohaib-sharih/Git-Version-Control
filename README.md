@@ -11,7 +11,7 @@
 | 7.0 GitHub and Remotes                            | 7.1 Introduction to github<br>7.2 Steps to creating a new Repository using HTTPS and SSH<br>7.3 Creating a repository using HTTPS<br>7.4 HTTPS METHOD<br>7.5 Using the SSH Key<br>7.6 SSH METHOD (using Default Location)<br>7.7 How to save SSH key in a Custom location?<br>7.8 Difference between *eval "(ssh-agent -s)"* and *ssh-agent bash*<br>7.9 Update Your Git Remote to Use SSH<br>7.10 Different types of Cryptographic Methods to generate SSH Key<br>7.11 Summary of Commands using SSH Method<br>7.12 How to check which SSH Key is being used by local repository?<br>7.13 How to update/change an SSH connection to your Remote connection? |
 | 8.0 Git Pull                                      | 8.1 What is the purpose of using GIT PULL and when to use it?<br>8.2 Interpretation of the git log --oneline<br>8.3 How to collaborate between Local and Remote Repositories.<br>8.4 Managing multiple commits to the same file<br>8.5 Merging: Resolving Conflict<br>8.6 Tracking and raising issues                                                                                                                                                                                                                                                                                                                                                        |
 | 9.0 Branching, Merging and Rebasing               | 9.1 Merge Types<br>9.2 Topic: Conflicts during merge<br>9.3 Git stash topic<br>9.4 Moving forward: Apply the stash on another branch<br>9.5 git stash show, git stash clear<br>9.6 How stash works (applies on the current branch or globally?)                                                                                                                                                                                                                                                                                                                                                                                                              |
-| 10.0 Rebase                                       | 10.0 Rebase<br>10.1 Difference between git merge and git rebase                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| 10.0 Rebase                                       | 10.0 Rebase<br>10.1 Difference between git merge and git rebase<br>10.2 When to use git rebase?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | 11.0 Git clone                                    | 11.0 Git clone<br>11.1 Cloning from git repository                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | 12.0 Forking                                      | 12.0 Forking<br>12.1 What is forking used for?<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | 13.0 Layout of Github \| Git Branches             | 13.0 Layout of Github Remote Repository/Dashboard<br>13.1 Git Branches                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
@@ -2835,6 +2835,8 @@ NOTE: **git rebase master** It helps you to **rebase** the current branch to the
 1. They eventually solve the same problem, but ***differently.***
 2. In **git merge**, you merge the differences of your current branch (when branched out) and the changes perhaps made in this **interim period** by another developer on the main branch.
 3. In **git rebase**, your last change made on the *branched out* level are saved in the level R commit instead of being saved inside *commit -m* level.
+4. **git rebase --abort:** *To abort and get back to the state before "git rebase"*
+5. **git rebase --continue:** 
 
 EXAMPLE
 1. You have 2 branches called *master* that contains 2 commits and *feature-branch* that contains only 2 commits which are also available in the master branch.
@@ -2923,6 +2925,41 @@ e281984 (HEAD -> master) added new file on MASTER only
 
 ```
 
+### 10.2 When to use git rebase?
+
+1. `git rebase` is used to **move your branch** to the tip of another branch — it's like "replaying" your commits on top of the latest base.
+2. Scenario 1: Keeping a feature branch updated
+	a. You’re working on `feature-1`, but `main` has new commits.
+	b. `git checkout feature-1
+		git rebase main`
+	c. Now your feature branch is based on the latest `main`.
+3. Scenario 2: Cleaning up commit history
+	a. Instead of merging (which creates extra merge commits), rebase makes history **linear and cleaner**.
+4. What Happens During Rebase? if Git finds conflicts during rebase:
+	a. It pauses the rebase.
+	b. You **resolve the conflict manually** in the file.
+	c. Then run:
+```
+git add <conflicted-file>
+git rebase --continue
+
+```
+
+5. Does `git rebase --continue` ignore conflicts?
+	a. **No**, it does **not ignore** conflicts.
+	b. It **resumes** rebase **after you’ve fixed** the conflicts.
+6. How to ***Resolve Merge*** Conflicts?
+	a. Open the conflicted file (you’ll see markers like `<<<<<<< HEAD`).
+	b. Edit and choose what to keep.
+	c. After fixing:
+```
+git add <file>
+git rebase --continue
+
+If you mess up and want to abort:
+
+git rebase --abort
+```
 
 ## 11.0 Git clone
 
@@ -3379,7 +3416,6 @@ This avoids messing up `.git` folders or pushing submodules accidentally.
 2. how to setup upstream on git
 3. **History**
 4. ****
-
 
 ## License
 
