@@ -15,7 +15,7 @@
 | 11.0 Git clone                                    | 11.0 Git clone<br>11.1 Cloning from git repository                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | 12.0 Forking                                      | 12.0 Forking<br>12.1 What is forking used for?<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | 13.0 Layout of Github \| Git Branches             | 13.0 Layout of Github Remote Repository/Dashboard<br>13.1 Git Branches                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-
+| 14.0 Scenerios                                    | 14.1 How to use a local repository for both Github and gitLab?<br>14.2 How do you initialize git one level up after already having pushed the current folder to github & gitlab?<br>14.3 Modifying an existing git repo with new sub folders and files<br>14.3.1 How to FIX it? *Option 1*<br>14.3.2 How to FIX it? *Option 2*<br>14.3.3 How to use rebase option(GPT Answer)<br>14.3.4 How to ignore a tracked file + subfolders                                                                                                                                                                                                                            |
 # 1.0 Installation
 
 2. Install Git from [[https://git-scm.com/downloads/win]]
@@ -3107,11 +3107,11 @@ Lesson Section
     1. Push the specified **local** branch to the **remote** repository (origin).
     2. Set the **upstream branch** for the **local** branch, which means that your local branch will be **linked** to the remote branch on the _specified remote repository (origin)_.
 	b. Simplifies Future Pushes and Pulls:
-    1. Once the upstream branch is set, you can simply use git push or git pull without specifying the remote and branch name. Git will remember the remote branch and automatically use it for future pushes and pulls.
-    2. **git push** and **git pull**
-    3. To track the **status** use **git status**
-    4. It helps keep track of changes and ensures that everyone is working on the correct branches, reducing the chance of errors in collaborative environments.
-    5. To check which **upstream** is the **local branch** tracking:  
+    3. Once the ***upstream*** branch is set, you can simply use git push or git pull without specifying the remote and branch name. Git will remember the remote branch and automatically use it for future pushes and pulls.
+    4. **git push** and **git pull**
+    5. To track the **status** use **git status**
+    6. It helps keep track of changes and ensures that everyone is working on the correct branches, reducing the chance of errors in collaborative environments.
+    7. To check which **upstream** is the **local branch** tracking:  
         **git branch -vv**
 
 ## 14.0 Scenerios
@@ -3190,6 +3190,14 @@ git push -u origin main
 
 ```
 
+g. You can also change the existing remote if you don’t want GitLab anymore:
+
+```
+git remote set-url origin https://github.com/yourusername/kubernetes.git
+
+git push origin main
+```
+
 2. **Conclusion:**
 	a. Now the parent `Kubernetes/` folder is the Git repo.
     b. `project_One/` remains a subfolder with its own `README.md`, no need for a separate Git repo inside it anymore.
@@ -3214,10 +3222,163 @@ git push
 ------------------------
 This keeps everything clean and conflict-free
 ```
+
+### 14.3 Modifying an existing git repo with new sub folders and files
+
+1. **Why you see an arrow symbol on your git repo subdirectory?** *What Happened?*
+	a. Cloned a repo.
+	b. Deleted its `.git` folder.
+	c. Initialized a **new Git repo at the parent level** (outside the cloned repo).
+	d. Made some changes inside the subfolder (which was originally a Git project).
+	e. Committed and **force pushed** to the original GitHub repo.
+	f. That arrow symbol (📁 ➡️) you're seeing on GitHub means **a submodule**.
+	g. Git treats folders that once were Git repos (even if `.git` is deleted) **and later added in a parent repo** as **submodules**, if not handled carefully.
+	h. The folder still had some leftover Git metadata or was treated like a submodule structure when staged/pushed.
+	i. You force pushed (`--force`), which ignored GitHub’s expected structure and overwrote the history.
+
+### 14.3.1 How to FIX it? *Option 1*
+
+1. Remove the submodule structure and push cleanly
+	a. Delete the submodule folder from the parent repo:
+```
+git rm --cached your-subfolder-name
+rm -rf your-subfolder-name
+
+```
+b. Re-add it as a regular folder (not a Git submodule):
+
+```
+mkdir your-subfolder-name
+# Copy your files back into it if needed
+git add your-subfolder-name
+git commit -m "Fix: remove submodule and re-add as normal folder"
+git push origin main
+
+```
+
+### 14.3.2 How to Fix it? *Option 2*
+
+1. Start fresh (if repo size and history aren’t important)
+2. Backup your work.
+3. Delete the GitHub repo.
+4. Create a new repo on GitHub.
+5. Push your parent repo with correct subfolders:
+
+```
+git remote set-url origin https://github.com/your-username/new-repo.git
+git push -u origin main
+
+```
+
+6. **Notes for Future**
+
+	a. Don’t delete `.git` inside a cloned repo unless you **really know** why you're doing it.
+	b. Instead of `--force`, use `git pull --rebase` or resolve conflicts when pushing.
+	c. Always commit and push from the root of your actual working project, and keep `.git` only in the root.
+
+### 14.3.3 How to use rebase option(GPT Answer)
+
+1. **The Setup**
+	a. You create a **parent folder**, e.g. `GPT-Projects`
+	b. Inside it you run:
+```
+git clone https://github.com/your-username/old-repo.git
+
+```
+c. **Rename the cloned folder**, e.g. `nutrition-check` ➜ `nutrition-assistant`
+d. **Create new files/folders in the parent folder** (`GPT-Projects`)
+e. Want to track and push everything from the **parent folder** as the new structure
+f.  But use `git pull --rebase` to avoid forcing changes.
+
+2. **How to Do This (Step-by-Step)**
+	a. Create Your Folder Structure
+```
+mkdir GPT-Projects
+cd GPT-Projects
+git clone https://github.com/your-username/your-repo.git
+mv your-repo nutrition-assistant  # Rename the cloned repo folder
+mkdir docs assets                 # Add your new folders in parent
+touch README.md index.md         # Add new files in parent
+
+Structure:
+
+GPT-Projects/
+├── nutrition-assistant/   ← (was cloned from GitHub)
+├── docs/
+├── assets/
+├── README.md
+└── index.md
+
+```
+b. Initialize Git at the Parent Level
+
+```
+git init
+git remote add origin https://github.com/your-username/your-repo.git
+git fetch origin main
+
+
+You now have Git history connected, but not yet pulled.
+```
+
+c. Stage and Commit the New Structure
+
+```
+git add .
+git commit -m "Restructured project layout with renamed folder and new files"
+
+```
+d. Pull with Rebase
+
+```
+git pull --rebase origin main
+
+This will:
+
+- Bring in remote commits (if any)
+- Replay your restructure commit on top of the pulled commits
+
+```
+
+e. **Push to GitHub**
+
+```
+You now have:
+
+- A clean history
+- No force push
+- A renamed subfolder + new folders all pushed from your **parent folder**
+```
+
+f. If Git shows any **conflict**, fix them manually and run:
+
+```
+git add <filename>
+git rebase --continue
+
+This avoids messing up `.git` folders or pushing submodules accidentally.
+```
+
+### 14.3.4 How to ignore a tracked file + subfolders
+
+1. Add the following in your **.gitignore file** to ignore a subfolder from your *local parent git repo*. One `.gitignore` at the root is enough for all subfolders.
+```
+/project_Two/venv/
+```
+2. If you accidentally ***tracked*** and ***pushed*** files you wanted to ignore, what do you do?
+	a. Remove it from tracking -> `git rm --cached project_Two/output.avi`
+	b. Commit the changes -> `git commit -m "Stop tracking output.avi"`
+	c. Now add the file in your .gitignore file -> `/project_Two/output.avi`
+	d. Push your code again, now the output.avi file that was accidentally pushed before will be removed.
+### Glossary
+
+1. **git fetch:** The purpose of `git fetch origin main` is to **download the latest changes** from the `main` branch of the remote repository (**without applying them** to your local branch yet). It helps you **see what's new on GitHub** before merging or rebasing.
 ### Additional research required
 
 1. git switch
 2. how to setup upstream on git
+3. **History**
+4. ****
 
 
 ## License
