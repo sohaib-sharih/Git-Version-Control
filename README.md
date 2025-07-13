@@ -1197,6 +1197,30 @@ Sometimes there are folders or modules that you don't want to push or add to you
 6. To ignore all Files + Folders, simply use an *asterisk*
 7. Run `git status --ignored` command to check if git is tracking any unwanted files.
 8. If git is tracking ***unwanted files/folders,*** then use the following command: `git rm -r --cached Data_cleaning_and_visualization/share/`
+
+```
+Examples
+
+To ignore `mypy_cache` from all folders:
+
+**/.mypy_cache/
+-------------------------------
+# Ignore all .pyc files
+*.pyc
+
+# Ignore a venv folder in the parent
+/venv/
+
+# Ignore a venv folder inside a subfolder called chapter_1
+/chapter_1/venv/
+
+# Ignore all __pycache__ folders
+__pycache__/
+
+# Ignore a file
+secret_notes.txt
+
+```
 # 6.0 Topic: Renaming Files
 
 1. `git mv <filename> <newFileName>`
@@ -2830,13 +2854,205 @@ BLANK, because it was deleted and cleared from the history of STASH.
 
 NOTE: **git rebase master** It helps you to **rebase** the current branch to the latest commit in ***master branch.***
 
+### 10.0.1 Example (When 1 branch is ahead)
+1. Below is example of a local git repo, that has 2 branches
+	a. master
+	b. one
+2. Both are up to date and have the same commit histories.
+3. We will switch the branch from ***one*** to ***master*** and a new file and a ***commit*** inside ***master branch.***
+4. Then apply **git rebase one** while we are in the ***master branch***
+5. Then switch the branch from ***master*** back to ***one*** and check the ***git log*** to compare the history with ***git log*** status of the master branch.
+6. ***Currently the one branch*** is 1 commit behind. Therefore using the ***git rebase master*** command will rebase the current ***one branch*** by adding the last commit made in the ***master branch*** to be rebased with the current branch ***one.***
+```
+master branch
+
+$ git log --oneline
+OUTPUT:
+
+06af91c (HEAD -> master, new/master, one) ten
+7545458 (practice/master) nine
+2a1d1b0 (practice/one, new/one) hello
+7a8de9c hello
+7de3232 (practice/two, new/two) eight
+------------------------------
+
+one branch
+
+$ git log --oneline
+
+OUTPUT:
+
+06af91c (HEAD -> one, new/master, master) ten
+7545458 (practice/master) nine
+2a1d1b0 (practice/one, new/one) hello
+7a8de9c hello
+7de3232 (practice/two, new/two) eight
+
+-----------------------------------
+
+Switch to master branch
+git checkout master
+
+git add .
+git commit -m 'added box.txt in the master branch'
+
+
+git log --oneline
+
+OUTPUT:
+
+4f4ebad (HEAD -> master) added box.txt in the master branch ---> NEW COMMIT (MASTER)
+06af91c (new/master, one) ten
+7545458 (practice/master) nine
+2a1d1b0 (practice/one, new/one) hello
+7a8de9c hello
+7de3232 (practice/two, new/two) eight
+
+--------------------------------------------
+
+git rebase one
+OUTPUT:
+
+Current branch master is up to date.
+
+INTERPRETATION:
+1. The current master branch is up to date because it already contains all the commits from the branch one, there are no additional commits in the 'one' branch that need to be rebased at the master branch.
+-----------------------------------------
+Switch to One branch
+git checkout one
+git log --oneline
+OUTPUT:
+
+06af91c (new/master, one) ten
+7545458 (practice/master) nine
+2a1d1b0 (practice/one, new/one) hello
+7a8de9c hello
+7de3232 (practice/two, new/two) eight
+
+----------------------------------------
+git rebase master
+OUTPUT:
+
+Successfully rebased and updated refs/heads/one.
+
+---------------------------
+one branch
+$ git log --oneline
+
+OUTPUT:
+
+4f4ebad (HEAD -> one, master) added box.txt in the master branch
+06af91c (new/master) ten
+7545458 (practice/master) nine
+2a1d1b0 (practice/one, new/one) hello
+7a8de9c hello
+7de3232 (practice/two, new/two) eight
+
+```
+
+### 10.0.2 Example (When both branches have different last commits)
+
+1. In this scenario, everything remains the same as the previous example, except for now, we will apply new commits in both the branches ***separately.***
+2. **Branch one:** Created a ***box2.txt file***
+3. **Branch master:** Created a ***box3.txt file***
+
+```
+BRANCH: one
+
+$ git log --oneline
+OUTPUT:
+e721474 (HEAD -> one) added box2.txt file in ONE branch  ---> box2.txt
+4f4ebad added box.txt in the master branch
+06af91c (new/master) ten
+7545458 (practice/master) nine
+2a1d1b0 (practice/one, new/one) hello
+7a8de9c hello
+7de3232 (practice/two, new/two) eight
+--------------------------------
+BRANCH: master
+
+$ git log --oneline
+
+OUTPUT:
+0b4e276 (HEAD -> master) added box3.txt inside MASTER branch ---> box3.txt
+4f4ebad added box.txt in the master branch
+06af91c (new/master) ten
+7545458 (practice/master) nine
+2a1d1b0 (practice/one, new/one) hello
+7a8de9c hello
+7de3232 (practice/two, new/two) eight
+
+--------------------------------------------
+
+BRANCH: Master
+
+$ git rebase one
+Successfully rebased and updated refs/heads/master.
+
+--------------------------
+BRANCH: Master
+git log --oneline
+
+OUTPUT:
+
+26bdbeb (HEAD -> master) added box3.txt inside MASTER branch
+e721474 (one) added box2.txt file in ONE branch  ---> Rebased Commit from branch one
+4f4ebad added box.txt in the master branch
+06af91c (new/master) ten
+7545458 (practice/master) nine
+2a1d1b0 (practice/one, new/one) hello
+7a8de9c hello
+7de3232 (practice/two, new/two) eight
+
+INTERPRETATION:
+1. Master branch has been rebased by bringing all the commits from branch ONE
+2. It placed its own RECENT/LAST commit on top of the commits taken from branch ONE.
+-----------------
+BRANCH: ONE
+git checkout one
+git log --oneline
+
+OUTPUT:
+
+e721474 (HEAD -> one) added box2.txt file in ONE branch
+4f4ebad added box.txt in the master branch
+06af91c (new/master) ten
+7545458 (practice/master) nine
+2a1d1b0 (practice/one, new/one) hello
+7a8de9c hello
+7de3232 (practice/two, new/two) eight
+
+-----------------------
+BRANCH: ONE
+Now REBASE branch ONE in accordance to MASTER Branch
+
+git rebase master
+OUTPUT:
+Successfully rebased and updated refs/heads/one.
+
+git log --oneline
+
+OUTPUT:
+
+26bdbeb (HEAD -> master) added box3.txt inside MASTER branch
+e721474 (one) added box2.txt file in ONE branch
+4f4ebad added box.txt in the master branch
+06af91c (new/master) ten
+7545458 (practice/master) nine
+2a1d1b0 (practice/one, new/one) hello
+7a8de9c hello
+7de3232 (practice/two, new/two) eight
+```
+
+4. **Conclusion:** Git rebase checks the level of commits in both branches, and then stacks the history of the other branch under the *last and most recent commit* made in the ***current branch*** that you are ***invoking to rebase***.
 ### 10.1 Difference between git merge and git rebase
 
 1. They eventually solve the same problem, but ***differently.***
 2. In **git merge**, you merge the differences of your current branch (when branched out) and the changes perhaps made in this **interim period** by another developer on the main branch.
 3. In **git rebase**, your last change made on the *branched out* level are saved in the level R commit instead of being saved inside *commit -m* level.
 4. **git rebase --abort:** *To abort and get back to the state before "git rebase"*
-5. **git rebase --continue:** 
+5. **git rebase --continue:** *it does **not ignore** conflicts. It **resumes** rebase **after you’ve fixed** the conflicts.*
+
 
 EXAMPLE
 1. You have 2 branches called *master* that contains 2 commits and *feature-branch* that contains only 2 commits which are also available in the master branch.
@@ -2945,7 +3161,7 @@ git rebase --continue
 
 ```
 
-5. Does `git rebase --continue` ignore conflicts?
+5. **NOTE:** Does `git rebase --continue` ignore conflicts?
 	a. **No**, it does **not ignore** conflicts.
 	b. It **resumes** rebase **after you’ve fixed** the conflicts.
 6. How to ***Resolve Merge*** Conflicts?
@@ -3023,7 +3239,6 @@ Git checkout to red, and other branch names and gradually all will become visibl
 
 ---------------
 
-
 There are generally 6 different types of Git statuses:
 
 1. **Untracked**: Are those files that are not tracked, but were created. You need to **add** them to the git config by running the **git add** command.
@@ -3032,7 +3247,6 @@ There are generally 6 different types of Git statuses:
 4. **Unstaged Changes**: Files modified but not yet staged.
 5. **Unmodified:** means that the file is being tracked, but no changes were made to it after adding all other files to stage.
 6. **Clean State**: Confirm that there are no changes to track.
-
 
 ### 12.0 Forking
 
@@ -3407,15 +3621,113 @@ This avoids messing up `.git` folders or pushing submodules accidentally.
 	b. Commit the changes -> `git commit -m "Stop tracking output.avi"`
 	c. Now add the file in your .gitignore file -> `/project_Two/output.avi`
 	d. Push your code again, now the output.avi file that was accidentally pushed before will be removed.
-### Glossary
+
+### 14.3.5 When to use git rebase and how to push your code to a github repo that is already initialized?
+
+1. Can You Use `git rebase` to Push Your Local Content to an Existing GitHub Repo? *Answer, Not directly.*
+2. Here why?:
+	a. `git rebase` is for rewriting commit history.
+	b. You only use it when **you already have both local and remote commits**, and want to **merge them cleanly**.
+3. For Your Case (using existing GitHub repo): If your local repo has content and GitHub has just a README, do this
+
+```
+cd Python   # your local folder
+
+git init
+git remote add origin https://github.com/yourusername/Python.git
+
+# Pull existing GitHub README
+git pull origin main --allow-unrelated-histories
+
+# Resolve any merge conflicts (if prompted)
+# Then:
+
+git add .
+git commit -m "Merge local Python content with GitHub README"
+git push origin main
+
+```
+4. That’s all you need — **no rebase needed** here unless you have conflicting histories with multiple contributors.
+5. ***--allow-unrelated-histories***
+	a. The `--allow-unrelated-histories` flag is used with `git pull` to allow Git to merge **two repositories that have unrelated histories**.
+6.  **Why is --allow-unrelated-histories needed?** *Normally, Git expects both local and remote repos to share a **common commit history**. But if:*
+	a. You created a **local repo independently**, and
+	b. The remote (e.g., GitHub) was initialized separately (with a README, LICENSE, etc.)
+	c. Then their histories don’t match — and Git will block the pull.
+
+What This Flag Does:
+```
+git pull origin main --allow-unrelated-histories
+
+INTERPRETATION:
+
+1. This tells Git: “It’s OK, I know these are separate histories — just try to merge them.”
+2. You may get **merge conflicts**, which you can resolve and then commit.
+3. Use it **once** when connecting an existing local repo to a separately-initialized GitHub repo.
+```
+### 14.3.6 How to Remove a Git Tracking Sub module from github
+
+1. Add the folder, submodule or file that is already being tracked and is uploaded on github in the **.gitignore** file.
+
+In .gitignore file add:
+
+```
+**/mypy_cache/
+```
+
+2. Then remove it from Git tracking (if already staged/tracked):
+```
+git rm -r --cached **/mypy_cache
+```
+
+3. Then commit and push:
+
+```
+git commit -m "Ignore mypy_cache folders"
+git push origin main (depending on your mainstream branch and remote connection name)
+```
+
+4. **Git reset:** If you have already used the git reset command then what do you do? *Answer:*
+	a. Only use `git rm -r --cached` if the `mypy_cache` folder was **already tracked or committed before**.
+	b. If you ran `git reset` **before committing**, and added `mypy_cache` to `.gitignore`, ✅ then you're good — **no need** to use `git rm`.
+5. **What is Git reset used for?**
+	a. To remove all staged files and folders (from `git add .`), use:
+	b. This would unstage everything but **keeps your changes**.
+	c. If you want to unstage specific folders: `git reset <foldername>`
+	d. If you want to unstage specific file: `git reset <file.avi>`
+
+### 14.3.7 What do you do if you've accidentally added the wrong files + folders in the gitignore file and want to change that?
+
+1. To remove all staged files and folders (from `git add .`), use:
+```
+git reset
+
+```
+2. This unstages everything but **keeps your changes**.
+3. **Specific Folders:** If you want to unstage specific files/folders:
+```
+git reset <file-or-folder>
+
+Example
+
+git reset output.avi
+
+```
+4. Now you can fix `.gitignore`, then run the following to stage only the correct files.:
+
+```
+git add .
+```
+
+### Glossary/ Additional Information
 
 1. **git fetch:** The purpose of `git fetch origin main` is to **download the latest changes** from the `main` branch of the remote repository (**without applying them** to your local branch yet). It helps you **see what's new on GitHub** before merging or rebasing.
+2. **git rm --cached:** Removes tracked files from cache and tracked files in the *staging area.*
+3. **Folder names:** Git does not care about the names of the Parent Project folders/Repositories in your *local repository* or the *git remote repository.*
 ### Additional research required
 
-1. git switch
-2. how to setup upstream on git
-3. **History**
-4. ****
+1. how to setup upstream on git
+2. **History**
 
 ## License
 
